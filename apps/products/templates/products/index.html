@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" type="text/css"
+   href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
+  <link rel="stylesheet" type="text/css"
+   href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Hello {{ user.first_name }}</h1>
+
+        <a href="{% url 'products:new' %}" class="button">Create Product</a>
+        <a href="{% url 'orders:index' %}" class="button">View Orders</a>
+        <a href="{% url 'orders:cart' %}" class="button">View Cart</a>
+        <a href="{% url 'users:logout' %}" class="button">Logout</a>
+
+    <div class="purchasable">
+      <h2>Products Available For Purchase</h2>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Num Available</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Creator</th>
+            <th>Actions</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+          {% for product in purchasable_products %}
+            <tr>
+              <td>
+                <a href="{% url 'products:show' product.id %}">{{ product.name }}</a>
+              </td>
+                <td>{{ product.num_available }}</td>
+                <td>${{ product.price }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.creator.first_name }} {{ product.creator.last_name }}</td>
+                <td>
+                <form action="{% url 'orders:add_product' %}" method="post">
+                  {% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="submit" value="Add To Cart">
+
+                </form>
+
+            </td>
+
+            </tr>
+
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="sellable">
+      <h2>Products You're Selling</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Num Available</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Creator</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in user.products.all %}
+            <tr>
+              <td>
+                <a href="{% url 'products:show' product.id %}">{{ product.name }}</a>
+              </td>
+              <td>{{ product.num_available }}</td>
+              <td>${{ product.price }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ product.creator.first_name }} {{ product.creator.last_name }}</td>
+              <td>
+                <a href="{% url 'products:edit' product.id %}" class="button">Edit Product</a>
+                <form action="{% url 'products:delete' product.id %}" method="post">
+                  {% csrf_token %}
+                  <input type="submit" value="Delete Product">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
